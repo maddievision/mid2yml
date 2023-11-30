@@ -112,5 +112,33 @@ module MIDIFile
       io.write_bytes(data1)
       io.write_bytes(data2) if DATA_SIZES[type] > 1
     end
+
+    def self.note_on(delta : UInt32, channel : UInt8, note : UInt8, velocity : UInt8)
+      self.new.tap { |e| e.delta = VLQ.from_value(delta); e.type = Type::NoteOn; e.channel = channel; e.data1 = note; e.data2 = velocity }
+    end
+
+    def self.note_off(delta : UInt32, channel : UInt8, note : UInt8, velocity : UInt8)
+      self.new.tap { |e| e.delta = VLQ.from_value(delta); e.type = Type::NoteOff; e.channel = channel; e.data1 = note; e.data2 = velocity }
+    end
+
+    def self.note_pressure(delta : UInt32, channel : UInt8, note : UInt8, pressure : UInt8)
+      self.new.tap { |e| e.delta = VLQ.from_value(delta); e.type = Type::NotePressure; e.channel = channel; e.data1 = note; e.data2 = pressure }
+    end
+
+    def self.control(delta : UInt32, channel : UInt8, number : UInt8, value : UInt8)
+      self.new.tap { |e| e.delta = VLQ.from_value(delta); e.type = Type::Control; e.channel = channel; e.data1 = number; e.data2 = value }
+    end
+
+    def self.program(delta : UInt32, channel : UInt8, program : UInt8)
+      self.new.tap { |e| e.delta = VLQ.from_value(delta); e.type = Type::Program; e.channel = channel; e.data1 = program }
+    end
+
+    def self.channel_pressure(delta : UInt32, channel : UInt8, pressure : UInt8)
+      self.new.tap { |e| e.delta = VLQ.from_value(delta); e.type = Type::ChannelPressure; e.channel = channel; e.data1 = pressure }
+    end
+
+    def self.pitch_bend(delta : UInt32, channel : UInt8, value : UInt16)
+      self.new.tap { |e| e.delta = VLQ.from_value(delta); e.type = Type::PitchBend; e.channel = channel; e.data1 = value & 0x7F; e.data2 = (value >> 7) & 0x7F }
+    end
   end
 end

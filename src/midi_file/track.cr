@@ -9,7 +9,7 @@ module MIDIFile
     endian :big
 
     string :chunk_id, length: ->{ 4 }, value: ->{ "MTrk" }, verify: ->{ chunk_id == "MTrk" }
-    uint32 :chunk_size
+    uint32 :chunk_size, value: ->{ data.size }
     bytes :data, length: ->{ chunk_size }
 
     def self.from_io(io, byte_format : IO::ByteFormat)
@@ -49,11 +49,12 @@ module MIDIFile
           last_status = event
         else
           io.write_bytes(event)
+          last_status = nil
         end
       end
 
-      self.chunk_size = io.pos.to_u32
       self.data = io.to_slice
+      self.chunk_size = self.data.size.to_u32
     end
   end
 end

@@ -3,7 +3,7 @@ require "bindata"
 require "../../src/midi_file/file"
 
 def write_chunk_with_size(io, id, size : UInt32)
-  io.write_string id.encode("ASCII")
+  io.write_string id.encode("UTF-8")
   io.write_bytes size, IO::ByteFormat::BigEndian
 end
 

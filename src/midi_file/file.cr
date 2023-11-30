@@ -13,8 +13,8 @@ module MIDIFile
 
     string :chunk_id, length: ->{ 4 }, value: ->{ "MThd" }, verify: ->{ chunk_id == "MThd" }
     uint32 :chunk_size, value: ->{ 6_u16 }, verify: ->{ chunk_size == 6 }
-    enum_field UInt16, format : Format = Format::SingleTrack
-    uint16 :track_count, verify: ->{
+    enum_field UInt16, format : Format = Format::MultiTrack
+    uint16 :track_count, value: -> { tracks.size.to_u16 }, verify: ->{
       case format
       when Format::SingleTrack
         track_count == 1
@@ -27,6 +27,11 @@ module MIDIFile
 
     def to_s(io)
       io << "#{self.class.name} #{format} Tracks: #{track_count} PPQN: #{ppqn}"
+    end
+
+    def to_io(io, byte_format : IO::ByteFormat)
+      self.track_count = tracks.size.to_u16
+      super
     end
   end
 end
