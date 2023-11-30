@@ -25,8 +25,7 @@ output_filename = opts.output
 
 puts "Converting #{input_filename} to #{output_filename}..."
 
-input_file = File.open(input_filename)
-midi_file = input_file.read_bytes(MIDIFile::File)
+midi_file = File.open(input_filename) { |f| f.read_bytes(MIDIFile::File) }
 
 puts midi_file
 
@@ -36,3 +35,5 @@ midi_file.tracks.each_with_index do |track, i|
     puts event
   end
 end
+
+File.open("./test.mid", "w") { |f| f.write_bytes(midi_file) }

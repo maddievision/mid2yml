@@ -1,10 +1,8 @@
 require "bindata"
 require "./common"
-require "./event"
 
 module MIDIFile
   class Event < BinData; end;
-
   class StatusEvent < Event
     enum Type
       NoteOff         = 0x8
@@ -26,7 +24,6 @@ module MIDIFile
       Type::PitchBend       => 2,
     }
 
-    property is_running_status : Bool = false
     uint8 :data1
     uint8 :data2, onlyif: ->{ DATA_SIZES[type] > 1 }
 
@@ -38,16 +35,14 @@ module MIDIFile
       @channel ||= event_head & 0x0F
     end
 
-    def apply_type(new_type : Type)
+    def type=(new_type : Type)
       @type = new_type
-      new_event_head = (event_head & 0x0F) | (new_type.value << 4)
-      event_head = new_event_head
+      self.event_head = (event_head & 0x0F) | (new_type.value << 4)
     end
 
-    def apply_channel(new_channel : UInt8)
+    def channel=(new_channel : UInt8)
       @channel = new_channel
-      new_event_head = (event_head & 0xF0) | (new_channel & 0x0F)
-      event_head = new_event_head
+      self.event_head = (event_head & 0xF0) | (new_channel & 0x0F)
     end
 
     def event_data # TODO make subclasses maybe?
@@ -83,7 +78,7 @@ module MIDIFile
     end
 
     def to_s(io)
-      io << "#{self.class.name} Delta: #{delta} Type: #{type} Channel: #{channel} #{event_data} #{is_running_status ? "running status" : ""}"
+      io << "#{self.class.name} Delta: #{delta} Type: #{type} Channel: #{channel} #{event_data}"
     end
 
     @@running_status_buffer = IO::Memory.new(8) # not thread-safe…
@@ -106,7 +101,16 @@ module MIDIFile
       end
       rs_io.rewind
 
-      self.from_io(rs_io, byte_format).tap { |e| e.is_running_status = true }
+      self.from_io(rs_io, byte_format)
+    end
+
+    def to_io_with_running_status(io, byte_format : IO::ByteFormat, running_status : StatusEvent?)
+      io.write_bytes(delta)
+      if !running_status || running_status.type != type || running_status.channel != channel
+        io.write_byte(event_head)
+      end
+      io.write_bytes(data1)
+      io.write_bytes(data2) if DATA_SIZES[type] > 1
     end
   end
 end

@@ -16,6 +16,11 @@ module MIDIFile
       super.tap { |t| t.parse_events(byte_format) }
     end
 
+    def to_io(io, byte_format : IO::ByteFormat)
+      apply(byte_format)
+      super
+    end
+
     def parse_events(byte_format : IO::ByteFormat)
       events = [] of Event
       io = IO::Memory.new(data)
@@ -33,6 +38,22 @@ module MIDIFile
         raise "Parsed size #{io.pos} does not match chunk length #{chunk_size}"
       end
       @events = events
+    end
+
+    def apply(byte_format : IO::ByteFormat)
+      io = IO::Memory.new(events.size * 4)
+      last_status : StatusEvent? = nil
+      events.each do |event|
+        if event.is_a?(StatusEvent)
+          event.to_io_with_running_status(io, byte_format, last_status)
+          last_status = event
+        else
+          io.write_bytes(event)
+        end
+      end
+
+      self.chunk_size = io.pos.to_u32
+      self.data = io.to_slice
     end
   end
 end
