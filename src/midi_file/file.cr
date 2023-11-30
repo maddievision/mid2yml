@@ -11,8 +11,8 @@ module MIDIFile
       MultiSong   = 2
     end
 
-    string :chunk_header, length: ->{ 4 }, value: ->{ "MThd" }, verify: ->{ chunk_header == "MThd" }
-    uint32 :chunk_length, value: ->{ 6_u16 }, verify: ->{ chunk_length == 6 }
+    string :chunk_id, length: ->{ 4 }, value: ->{ "MThd" }, verify: ->{ chunk_id == "MThd" }
+    uint32 :chunk_size, value: ->{ 6_u16 }, verify: ->{ chunk_size == 6 }
     enum_field UInt16, format : Format = Format::SingleTrack
     uint16 :track_count, verify: ->{
       case format

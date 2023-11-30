@@ -8,9 +8,9 @@ module MIDIFile
 
     endian :big
 
-    string :chunk_header, length: ->{ 4 }, value: ->{ "MTrk" }, verify: ->{ chunk_header == "MTrk" }
-    uint32 :chunk_length
-    bytes :data, length: ->{ chunk_length }
+    string :chunk_id, length: ->{ 4 }, value: ->{ "MTrk" }, verify: ->{ chunk_id == "MTrk" }
+    uint32 :chunk_size
+    bytes :data, length: ->{ chunk_size }
 
     def self.from_io(io, byte_format)
       track = super
@@ -84,8 +84,8 @@ module MIDIFile
         end
       end
 
-      if io.pos != chunk_length
-        raise "Parsed size #{io.pos} does not match chunk length #{chunk_length}"
+      if io.pos != chunk_size
+        raise "Parsed size #{io.pos} does not match chunk length #{chunk_size}"
       end
       @events = events
     end

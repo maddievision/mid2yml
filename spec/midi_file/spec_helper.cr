@@ -2,9 +2,9 @@ require "spec"
 require "bindata"
 require "../../src/midi_file/file"
 
-def write_chunk_with_length(io, header, length : UInt32)
-  io.write_string header.encode("ASCII")
-  io.write_bytes length, IO::ByteFormat::BigEndian
+def write_chunk_with_size(io, id, size : UInt32)
+  io.write_string id.encode("ASCII")
+  io.write_bytes size, IO::ByteFormat::BigEndian
 end
 
 def write_eot_event(io)
