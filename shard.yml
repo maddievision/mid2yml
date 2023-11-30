@@ -1,0 +1,21 @@
+name: mid2yml
+version: 0.1.0
+
+authors:
+  - Maddie Lim <maddievision@gmail.com>
+
+dependencies:
+  bindata:
+    github: spider-gazelle/bindata
+    version: ~> 1.11.1
+  toka:
+    github: Papierkorb/toka
+    commit: b2044c8410bd82a905db75f1ab23e895760544c7
+
+targets:
+  mid2yml:
+    main: src/mid2yml.cr
+
+crystal: '>= 1.10.1'
+
+license: MIT

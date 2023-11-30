@@ -1,0 +1,10 @@
+version: 2.0
+shards:
+  bindata:
+    git: https://github.com/spider-gazelle/bindata.git
+    version: 1.11.1
+
+  toka:
+    git: https://github.com/papierkorb/toka.git
+    version: 0.1.2+git.commit.b2044c8410bd82a905db75f1ab23e895760544c7
+
