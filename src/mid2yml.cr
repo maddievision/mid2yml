@@ -30,8 +30,6 @@ midi_file = input_file.read_bytes(MIDIFile::File)
 
 puts midi_file
 
-midi_file.parse_events
-
 midi_file.tracks.each_with_index do |track, i|
   puts "Track #{i + 1}, Event Count: #{track.events.size}}"
   track.events.each do |event|

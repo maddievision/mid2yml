@@ -8,9 +8,15 @@ module MIDIFile
 
     endian :big
 
-    string :chunk_header, length: -> { 4 }, value: -> { "MTrk" }, verify: -> { chunk_header == "MTrk" }
+    string :chunk_header, length: ->{ 4 }, value: ->{ "MTrk" }, verify: ->{ chunk_header == "MTrk" }
     uint32 :chunk_length
-    bytes :data, length: -> { chunk_length }
+    bytes :data, length: ->{ chunk_length }
+
+    def self.from_io(io, byte_format)
+      track = super
+      track.parse_events
+      track
+    end
 
     def parse_events
       events = [] of Event
@@ -71,7 +77,7 @@ module MIDIFile
             event_buffer.write_byte(data_byte.not_nil!)
           end
 
-          event_buffer.pos = 0
+          event_buffer.rewind
 
           event = event_buffer.read_bytes(StatusEvent)
           events << event
